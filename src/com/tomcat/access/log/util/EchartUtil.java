@@ -12,8 +12,9 @@ import com.google.gson.JsonObject;
 import com.tomcat.access.log.AccessLogUtil;
 import com.tomcat.access.log.GeoIpUtil;
 
-public class EchartUtil {
-    public static String parseSingleFile(String map, final String fileName) {
+public class EchartUtil extends BaseUtil {
+    @Override
+    public String parseSingleFile(String map, final String fileName) {
         Gson gson = new Gson();
         JsonArray countriesArray = gson.fromJson(map, JsonArray.class);
 
@@ -36,7 +37,7 @@ public class EchartUtil {
             }
 
             if (i >= countriesArray.size()) {
-                System.err.printf("Couldn't resolve: ip=%s, countryName=%s, countryCode=%s%n", 
+                System.err.printf("Couldn't resolve: ip=%s, countryName=%s, countryCode=%s%n",
                         ip, GeoIpUtil.getCountryName(ip), GeoIpUtil.getCountryCode(ip));
             }
         }
@@ -44,25 +45,17 @@ public class EchartUtil {
         return countriesArray.toString();
     }
 
-    public static String parseDirectory(String map, final String directory) {
+    @Override
+    public String parseDirectory(String map, final String directory) {
         File folder = new File(directory);
         List<String> fileNameList = new ArrayList<String>();
-        listFilesForFolder(folder, fileNameList);
+        this.listFilesForFolder(folder, fileNameList);
 
         for (String fileName : fileNameList) {
-            map = parseSingleFile(map, fileName);
+            map = this.parseSingleFile(map, fileName);
         }
 
         return map;
     }
 
-    private static void listFilesForFolder(final File folder, List<String> fileNameList) {
-        for (final File fileEntry : folder.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                listFilesForFolder(fileEntry, fileNameList);
-            } else {
-                fileNameList.add(fileEntry.getAbsolutePath());
-            }
-        }
-    }
 }
